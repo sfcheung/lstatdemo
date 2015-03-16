@@ -2,4 +2,4 @@
 
 Demonstrations, usually shiny apps, for learning statistics.
 
-Apps in `statDemos` will be migrated to this repository.
+Still in very early development. Apps in `statDemos` have been migrated to this repository. However, they have not yet been modified.
