@@ -7,7 +7,7 @@
 rundemo(demoname)
 }
 \arguments{
-\item{demo}{The name of the demo}
+\item{demoname}{The name of the demo}
 }
 \value{
 The app will start in a web browser
@@ -16,6 +16,8 @@ The app will start in a web browser
 This function run a shiny app demo in this package
 }
 \examples{
+\dontrun{
 rundemo("ANOVAResidual")
+}
 }
 
