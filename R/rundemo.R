@@ -10,6 +10,7 @@
 #'\dontrun{
 #'rundemo("ANOVAResidual")
 #'}
+#' @export
 
 rundemo <- function(demoname) {
   shiny::runApp(system.file(demoname, package="lstatdemo"))
