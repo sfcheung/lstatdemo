@@ -11,7 +11,7 @@
 # lm_m <- lm(output_weight ~ work_hour)
 # lm_y <- lm(salary ~ output_weight)
 # semPaths(lm_m + lm_y, what="paths",
-         # rotation=2, residuals=FALSE, intercepts=FALSE, 
+         # rotation=2, residuals=FALSE, intercepts=FALSE,
          # layout="tree2", nCharNodes=0,
          # nodeLabels=c("Work\nTime", "Output\nWeight", "Salary"),
          # sizeMan=10,
@@ -40,7 +40,7 @@ ui <- fluidPage(
     column(12,
       wellPanel(
         h4("Work in progress. Not yet ready."),
-        h4("Description Panel", br(), 
+        h4("Description Panel", br(),
             a("Reference", href="http://www.apa.org/pubs/journals/features/met-16-2-93.pdf"))
         ),
       fluidRow(
@@ -79,14 +79,10 @@ ui <- fluidPage(
   fluidRow(
     column(12,
       wellPanel(
-        p("The latest version of the code can be found at ",
-          a("statDemos at GitHub", 
-            href="https://github.com/sfcheung/statDemos/mediationStdES"),
-          "."
-          ),
-        p("The whole repository can be downloaded from GitHub and run in R by",
-          code("runGitHub(\"statDemos\",\"sfcheung\",subdir=\"mediationStdES\")")
-          )
+        p("This webpage is included in the package",
+          a("lstatdemo",
+            href="https://github.com/sfcheung/lstatdemo/"),
+          " at GitHub.")
         )
       )
     )

@@ -1,5 +1,4 @@
 # Generate a scatterplot for user-specified Pearson's r
-# To run in R: runGitHub("statDemos","sfcheung",subdir="rScatterplot")
 
 rho <- .8 # Population correlation
 n <- 500  # Sample size
@@ -41,14 +40,10 @@ ui <- fluidPage(
   fluidRow(
     column(12,
       wellPanel(
-        p("The latest version of the code can be found at ",
-          a("statDemos at GitHub", 
-            href="https://github.com/sfcheung/statDemos/tree/master/rScatterplot"),
-          "."
-          ),
-        p("The whole repository can be downloaded from GitHub and run in R by",
-          code("runGitHub(\"statDemos\",\"sfcheung\",subdir=\"rScatterplot\")")
-          )
+        p("This webpage is included in the package",
+          a("lstatdemo",
+            href="https://github.com/sfcheung/lstatdemo/"),
+          " at GitHub.")
         )
       )
     )
@@ -67,7 +62,7 @@ server <- function(input, output) {
     cexAll <- 1.5
     # Don't know why cex cannot control the magnification of all elements
     # So used cexAll here
-    plot(x,y, cex=cexAll, cex.axis=cexAll, cex.lab=cexAll, 
+    plot(x,y, cex=cexAll, cex.axis=cexAll, cex.lab=cexAll,
          cex.sub=cexAll, cex.main=cexAll, pch="o", col="blue",
          main=paste("Scatter Plot (Pearson's r = ", sprintf("%4.2f", r), ")",
               sep=""),

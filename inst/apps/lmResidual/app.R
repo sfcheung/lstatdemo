@@ -12,7 +12,7 @@ b1def <- 0  # Initial slope
 predictor <- c(1,1.5,2,2.5,3,3.5,4,4.5,5,5.5)
 outcome <- c(30,40,10,30,40,60,40,60,40,70)
 lmData <- data.frame(predictor, outcome)
-n <- nrow(lmData) # Sample size 
+n <- nrow(lmData) # Sample size
 # Linear regression for this data
 lm.results <- lm(outcome ~ predictor, data=lmData)
 lm.rss <- anova(lm.results)$Sum[2]
@@ -21,7 +21,7 @@ lm.rsq <- summary(lm.results)$r.squared
 
 # The following lines are not ready
 # Models tried
-models <- data.frame(b0=rep(NA,5), b1=rep(NA,5), 
+models <- data.frame(b0=rep(NA,5), b1=rep(NA,5),
                       RSS=rep(NA,5), Rsquared=rep(NA,5))
 models[1,] <- c(b0def, b1def, 0, 0)
 
@@ -59,8 +59,8 @@ ui <- fluidPage(
             )
           ),
         column(8,
-          h5(paste("The \"best\" (least squares) model: Residual sum of squares=", 
-              format(lm.rss, nsmall=2), 
+          h5(paste("The \"best\" (least squares) model: Residual sum of squares=",
+              format(lm.rss, nsmall=2),
               " ; R-squared=",
               sprintf("%3.2f", lm.rsq), sep="")),
           h5(textOutput("rss")),
@@ -75,14 +75,10 @@ ui <- fluidPage(
   fluidRow(
     column(12,
       wellPanel(
-        p("The latest version of the code can be found at ",
-          a("statDemos at GitHub", 
-            href="https://github.com/sfcheung/statDemos/tree/master/lmResidual"),
-          "."
-          ),
-        p("The whole repository can be downloaded from GitHub and run in R by",
-          code("runGitHub(\"statDemos\",\"sfcheung\",subdir=\"lmResidual\")")
-          )
+        p("This webpage is included in the package",
+          a("lstatdemo",
+            href="https://github.com/sfcheung/lstatdemo/"),
+          " at GitHub.")
         )
       )
     )
@@ -109,8 +105,8 @@ ui <- fluidPage(
                    # #tableOutput("modelsTab")
                   # ),
       # mainPanel(
-          # h5(paste("The \"best\" (least squares) model: Residual sum of squares=", 
-              # format(lm.rss, nsmall=2), 
+          # h5(paste("The \"best\" (least squares) model: Residual sum of squares=",
+              # format(lm.rss, nsmall=2),
               # " ; R-squared=",
               # sprintf("%3.2f", lm.rsq), sep="")),
           # h5(textOutput("rss")),
@@ -139,7 +135,7 @@ server <- function(input, output) {
       # Don't know why cex cannot control the magnification of all elements
       # So used cexAll here
       # Generate the plot object
-      plot(predictor, outcome, 
+      plot(predictor, outcome,
             xlim=c(xlo,xhi), ylim=c(min(outcome, ylo),max(outcome,yhi)),
             pch="O", cex=cexAll, cex.axis=cexAll, cex.main=cexAll, cex.lab=cexAll,
             xlab="Average hours watched TV daily in last seven days",
@@ -157,8 +153,8 @@ server <- function(input, output) {
       outcome_hat <- b0i + b1i*predictor
       rssi <- sum((outcome_hat - outcome)^2)
       rsqi <- 1-rssi/lm.tss
-      paste("Your model: Residual sum of squares=", 
-            format(rssi, nsmall=2), 
+      paste("Your model: Residual sum of squares=",
+            format(rssi, nsmall=2),
             " ; R-squared=",
             sprintf("%3.2f", rsqi), sep="")
     })
