@@ -1,8 +1,8 @@
 Package: lstatdemo
 Type: Package
 Title: Demonstrations, usually shiny apps, for learning statistics
-Version: 0.0.0.9002
-Date: 2015-11-15
+Version: 0.0.0.9003
+Date: 2015-12-01
 Authors@R: person("Cheung", "Shu-Fai",
            email="shufai.cheung@gmail.com",
            role=c("aut", "cre"))

@@ -8,11 +8,11 @@ gp_f <- factor(levels(anova.data$group))
 anova.data$score <- anova.data$score -
                     rep(gp_means, times=table(anova.data$group))
                     
-anova.data.wide <- cast(anova.data, person ~ group, value="score")
+#anova.data.wide <- cast(anova.data, person ~ group, value="score")
 
 person_def <- rep(c("Person 1", "Person 2", "Person 3", "Person 4", "Person 5"), times=4)
-person_hi <- person_1[c(1:5, 5+c(1,2,3,5,4), 10+c(1,2,5,4,3), 15+c(1,2,5,3,4))]
-person_lo <- person_1[c(1:5, 5+c(4,3,2,5,1), 10+c(1,4,5,2,3), 15+c(2,1,5,4,3))]
+person_hi <- person_def[c(1:5, 5+c(1,2,3,5,4), 10+c(1,2,5,4,3), 15+c(1,2,5,3,4))]
+person_lo <- person_def[c(1:5, 5+c(4,3,2,5,1), 10+c(1,4,5,2,3), 15+c(2,1,5,4,3))]
 persons <- list(person_lo, person_def, person_hi)
                     
 # Initial gp_means
@@ -35,15 +35,38 @@ ui <- fluidPage(
   fluidRow(
     column(12,
       wellPanel(
-        p("This demonstration shows ..."),
-        p("You can also change ..."),
-        p("...")
+        p("This demonstration shows how repeated measures one-way ",
+          "ANOVA can be different from independent group one-way",
+          "ANOVA. The scenario has 20 scores. On the left, the ",
+          "indepdent group case, there are four groups of people, ",
+          "each with five persons.",
+          "Each person was measured once, resulting in four means, each ",
+          "with five scores.",
+          "On the right, the repeated measures scenario, we have ",
+          "exactly the same 20 scores. However, this scenario only has",
+          "five persons, each measured four times, again resulting in ",
+          "four measns."),
+        p("This is analogous to a situation in which we want to study",
+          "differences in the four years of study on a variable, say, ",
+          "stress. We can recruit four groups of students, from Year 1 to ",
+          "Year 4, and measure their stress levels. We can also recruit ",
+          "one group of students, and measure their stress levels once",
+          "every year for four years."),
+        p("You can change the means for each group/time, and see how ",
+          "the two analyses, based on exactly the same set of 20 scores",
+          "differ, especially in the F test of effect."),
+        p("You can also change the degree of correlation of the four",
+          "scores from a person, and see how the residual sums of squares",
+          "in repeated measures analysis changes."),
+        p("Last, you can change the within-measure variance, and see how",
+          "the within-person sum of squaresin the independent",
+          "group analysis changes.")
         ),
       fluidRow(
         column(4,
           wellPanel(
             p("Change the following and see how the residuals change:"),
-               h6("Means:"),
+               h4("Means:"),
                sliderInput('m1', "Group 1",
                   min=gp_means_min, max=gp_means_max, value=gp_means[1], step=1),
                sliderInput('m2', "Group 2",
@@ -53,18 +76,18 @@ ui <- fluidPage(
                sliderInput('m4', "Group 4",
                   min=gp_means_min, max=gp_means_max, value=gp_means[4], step=1),
                br(),
-               h6("Within-Person Correlation"),
+               h4("Within-Person Correlation"),
                radioButtons('per_corr',
                 "Select how correlated a person's scores are",
                 c("Low"=1, "Default"=2, "High"=3), selected=2),
-               h6("Within Measure Variation"),
+               h4("Within-Measure Variation"),
                sliderInput('sdC',
                 "Increase/decrease variation within a measure by this factor",
                   min=sdC_min, max=sdC_max, value=1, step=.05)
               )
           ),
         column(8,
-          plotOutput('plot', height="600px")
+          plotOutput('plot', height="800px")
           )
         )
       )
@@ -156,15 +179,24 @@ server <- function(input, output, session) {
     par(mar=c(5,2,3,2))
 
     # Plot group means
-    plot(gp_f, gp_means, border="white",
-        ylim=c(yMin, yMax),
-        ylab="Score",
-        xlab="Group",
-        main=c("Group Means"), cex.axis=1.5, cex.main=1.5, cex.lab=1.5)
-    points(gp_f, gp_means, cex=cexPt, pch=16)
-    lines(gp_f, gp_means, col="blue", lwd=4)
+    #plot(gp_f, gp_means, border="white",
+    #    ylim=c(yMin, yMax),
+    #    ylab="Score",
+    #    xlab="Group",
+    #    main=c("Group Means"), cex.axis=1.5, cex.main=1.5, cex.lab=1.5)
+    #points(gp_f, gp_means, cex=cexPt, pch=16)
+    #lines(gp_f, gp_means, col="blue", lwd=4)
+    #abline(h=g_mean, lty="dotted", lwd=2, col="red")
+    plot(gp_means, 
+         type="o", ylim=c(yMin, yMax), axes=FALSE, 
+         xlab="Group", ylab="Score", main="Independent Group", pch=16,
+         col="blue", cex=2, lwd=4, cex.axis=1.5, cex.main=1.5, cex.lab=1.5)
+    axis(2, at=seq(yMin, yMax, 5), cex.axis=1.5)
+    axis(1, at=1:4, labels=c("Group 1", "Group 2", "Group 3", "Group 4"),
+         cex.axis=1.5)
     abline(h=g_mean, lty="dotted", lwd=2, col="red")
-
+    box()
+    
     # Plot deviation from grand mean
     #plot(anova.data.i$score,
     #    ylim=c(yMin, yMax),
@@ -186,7 +218,7 @@ server <- function(input, output, session) {
          col="red", cex=2, lwd=2, cex.axis=1.5, cex.main=1.5, cex.lab=1.5)
     axis(2, at=seq(yMin, yMax, 5), cex.axis=1.5)
     axis(1, at=1:4, labels=c("Time 1", "Time 2", "Time 3", "Time 4"),
-         cex.axis=1.5, )
+         cex.axis=1.5)
     lines(1:4, anova.data.i[anova.data.i$person == "Person 2", "score"], 
           type="o", col="blue", cex=2, lwd=2)
     lines(1:4, anova.data.i[anova.data.i$person == "Person 3", "score"], 
@@ -206,11 +238,13 @@ server <- function(input, output, session) {
     barplot(anova.SS,
             xlab="", ylab="",
             col=c(rgb(1,0.5,0.5,.25),rgb(0.5,0.5,1,.25)),
-            legend=rownames(anova.SS), horiz=FALSE,
+            horiz=FALSE,
             main=c("Independent Group: Partition the Total Sum of Squares",
-                    paste("(Between SS: ",sprintf("%8.2f",SSb),
-                          " / Within SS: ",sprintf("%8.2f",SSw),")",
+                    paste("(Between SS:",sprintf("%8.2f",SSb),
+                          " / Within SS:",sprintf("%8.2f",SSw),")",
                           sep="")), cex.axis=1.5, cex.main=1.5, cex.lab=1.5)
+    legend("right", legend=rownames(anova.SS), cex=1.75, 
+           fill=c(rgb(1,0.5,0.5,.25),rgb(0.5,0.5,1,.25)))
 
     # Plot sums of squares
     anova_r.SS <- matrix(c(SSb_r, SSw_r, SSr_r), 3, 1)
@@ -219,12 +253,14 @@ server <- function(input, output, session) {
     barplot(anova_r.SS,
             xlab="", ylab="",
             col=c(rgb(1,0.5,0.5,.25),rgb(0.5,0.5,1,.25),rgb(0.5,0.5,0.5,.25)),
-            legend=rownames(anova_r.SS), horiz=FALSE,
+            horiz=FALSE,
             main=c("Repeated Measures: Partition the Total Sum of Squares",
-                    paste("(Measures SS: ",sprintf("%8.2f",SSb_r),
-                          " / Residual SS: ",sprintf("%8.2f",SSw_r),
-                          " / Person SS: ",sprintf("%8.2f",SSr_r),")",
+                    paste("(Measures SS:",sprintf("%8.2f",SSb_r),
+                          " / Residual SS:",sprintf("%8.2f",SSw_r),
+                          " / Person SS:",sprintf("%8.2f",SSr_r),")",
                           sep="")), cex.axis=1.5, cex.main=1.5, cex.lab=1.5)
+    legend("right", legend=rownames(anova_r.SS), cex=1.75, 
+           fill=c(rgb(1,0.5,0.5,.25),rgb(0.5,0.5,1,.25),rgb(0.5,0.5,0.5,.25)))
 
 
     # Plot deviation of group mean from grand mean
@@ -254,11 +290,11 @@ server <- function(input, output, session) {
     abline(v=F.cut, lwd=1, col="black", lty="dotted")
     text(F.cut, FdMax,
         paste("Critical value\n", sprintf("%3.2f",F.cut), sep=""),
-        adj=c(0.5,1), cex=1.5)
+        adj=c(0.5,1), cex=1.75)
     abline(v=anova.F, lwd=1, col="red")
     text(anova.F, FdMax*.5, paste("Sample F\n", sprintf("%3.2f", anova.F),
                                   "\np-value=", sprintf("%5.4f", anova.F.p),
-                                  sep=""), cex=1.5)
+                                  sep=""), cex=1.75)
 
     # Plot F distribution
     plot(FRange_r,Fd_r,type="l",
@@ -271,11 +307,11 @@ server <- function(input, output, session) {
     abline(v=F_r.cut, lwd=1, col="black", lty="dotted")
     text(F_r.cut, FdMax_r,
         paste("Critical value\n", sprintf("%3.2f",F_r.cut), sep=""),
-        adj=c(0.5,1), cex=1.5)
+        adj=c(0.5,1), cex=1.75)
     abline(v=anova_r.F, lwd=1, col="red")
     text(anova_r.F, FdMax_r*.5, paste("Sample F\n", sprintf("%3.2f", anova_r.F),
                                   "\np-value=", sprintf("%5.4f", anova_r.F.p),
-                                  sep=""), cex=1.5)
+                                  sep=""), cex=1.75)
 
 
 
