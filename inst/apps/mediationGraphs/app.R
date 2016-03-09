@@ -1,4 +1,4 @@
-# [Brief description]
+# Demonstrate mediation [Work-in-progress]
 # A template for sidebar panel layout with 
 # one description panel below the title,
 # and one bottom panel at the end.
@@ -11,16 +11,21 @@ xmax <- 10
 
 # UI
 ui <- fluidPage(
-  titlePanel("Title Panel"),
+  titlePanel("Illustrate mediation [Work-in-progress]"),
   fluidRow(
     column(12,
       wellPanel(
-        h4("Description Panel")
+        h4("Description (To be added)")
         ),
       fluidRow(
         column(4,
           wellPanel(
-            h4("Sibebar Panel"),
+            h4("Settings"),
+            br(),
+            sliderInput('xi',
+              label=h5("X"),
+              min=xmin, max=xmax, value=5, step=.5,
+              ticks=TRUE),
             br(),
             sliderInput('bmx',
               label=h5("Effect: X on M"),
@@ -32,9 +37,9 @@ ui <- fluidPage(
               min=-1, max=1, value=.5, step=.1,
               ticks=TRUE),
             br(),
-            sliderInput('xi',
-              label=h5("X"),
-              min=xmin, max=xmax, value=5, step=.5,
+            sliderInput('byx',
+              label=h5("Direct Effect: X on Y"),
+              min=-1, max=1, value=0, step=.1,
               ticks=TRUE),
             br(),
             sliderInput('bmx0',
@@ -47,8 +52,8 @@ ui <- fluidPage(
               min=-1, max=1, value=0, step=.1,
               ticks=TRUE),
             br(),
-            h5("Technical details:"),
-            paste("[Technical details]", sep="")
+            h5("Technical details: [To be added]"),
+            paste("[Technical details: (To be added)]", sep="")
             )
           ),
         column(8,
@@ -78,12 +83,13 @@ server <- function(input, output) {
   output$plot <- renderPlot({
     bmx <- input$bmx
     bym <- input$bym
+    byx <- input$byx
     bmx0 <- input$bmx0
     bym0 <- input$bym0
     mmin0 <- bmx0 + bmx*xmin
     mmax0 <- bmx0 + bmx*xmax
-    ymin0 <- bym0 + bym*mmin0
-    ymax0 <- bym0 + bym*mmax0
+    ymin0 <- bym0 + bym*mmin0 + byx*xmin
+    ymax0 <- bym0 + bym*mmax0 + byx*xmax
     m2 <- sort(c(mmin0, mmax0))
     #mmin <- floor(m2[1]); mmax <- ceiling(m2[2])
     mmin <- (m2[1]); mmax <- (m2[2])
@@ -92,7 +98,7 @@ server <- function(input, output) {
     ymin <- (y2[1]); ymax <- (y2[2])
     xi <- input$xi
     mi <- bmx0 + bmx*xi
-    yi <- bym0 + bym*mi
+    yi <- bym0 + bym*mi + byx*xi
     par(mfrow=c(1, 2))
     plot(x=NULL, y=NULL, xlim=c(xmin, xmax), ylim=c(mmin, mmax), 
           type="n", xlab="X", ylab="M", asp=1)
@@ -101,7 +107,7 @@ server <- function(input, output) {
     arrows(xi, mi, xmin, mi)
     plot(x=NULL, y=NULL, xlim=c(mmin, mmax), ylim=c(ymin, ymax), 
           type="n", xlab="M", ylab="Y", asp=1)
-    abline(bym0, bym, lwd=2, col="red")
+    abline(bym0 + byx*xi, bym, lwd=2, col="red")
     arrows(mi, ymin, mi, yi)
     arrows(mi, yi, mmin, yi)
     })
