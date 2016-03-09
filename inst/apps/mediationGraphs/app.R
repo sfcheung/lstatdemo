@@ -4,6 +4,8 @@
 # and one bottom panel at the end.
 # To run in R: runGitHub("lstatdemo","sfcheung",subdir="mediationGraphs")
 
+library(grid)
+
 # Global variables
 
 xmin <- 0
@@ -60,6 +62,8 @@ ui <- fluidPage(
           ),
         column(8,
           plotOutput('plot')
+          #br(),
+          #plotOutput('plot2')
           )
         )
       )
@@ -111,9 +115,7 @@ server <- function(input, output) {
     y_change <- yi - yh
     # Plot the graphs
     par(mfrow=c(1, 2))
-    #par(oma=c(4, 2, 2, 2))
-    #par(mgp=c(0, 1, 0))
-    #par(mar=c(8, 1, 1, 1))
+    #layout(matrix(c(1, 2, 1, 2, 3, 3), 3, 2, byrow=TRUE))
     arrow_len <- .10
     plot(x=NULL, y=NULL, xlim=c(xmin, xmax), ylim=c(mmin, mmax), 
           type="n", xlab="X", ylab="M", asp=1, 
@@ -127,6 +129,8 @@ server <- function(input, output) {
     suppressWarnings(arrows(xi, mi, parusr[1], mi, length=arrow_len, col="blue", lwd=2, lty="dotted"))
     suppressWarnings(arrows(xh, parusr[3], xh, mh, length=arrow_len, col="black", lty="dotted"))
     suppressWarnings(arrows(xh, mh, parusr[1], mh, length=arrow_len, col="blue", lty="dotted"))
+    suppressWarnings(arrows(xh, mh, xi, mi, length=arrow_len*2, col="black", lwd=6, lty="dotted"))
+    
     plot(x=NULL, y=NULL, xlim=c(mmin, mmax), ylim=c(ymin, ymax), 
           type="n", xlab="M", ylab="Y", asp=1, 
           main=paste("M on Y (b path)", "\n",
@@ -140,11 +144,22 @@ server <- function(input, output) {
     suppressWarnings(arrows(mi, yi, parusr[1], yi, length=arrow_len, col="red", lwd=2, lty="dotted"))
     suppressWarnings(arrows(mh, parusr[3], mh, yh, length=arrow_len, col="blue", lty="dotted"))
     suppressWarnings(arrows(mh, yh, parusr[1], yh, length=arrow_len, col="red", lty="dotted"))
-    suppressWarnings(arrows(mh, yh, mh, lm_y(xi, mh), length=arrow_len*2, col="black", lwd=4, lty="dotted"))
-    suppressWarnings(arrows(mh, lm_y(xi, mh), mi, yi, length=arrow_len*2, col="blue", lwd=4, lty="dotted"))
+    suppressWarnings(arrows(mh, yh, mh, lm_y(xi, mh), length=arrow_len*2, col="black", lwd=6, lty="dotted"))
+    suppressWarnings(arrows(mh, lm_y(xi, mh), mi, yi, length=arrow_len*2, col="blue", lwd=6, lty="dotted"))
+    
+    #plot(x=NULL, y=NULL, xlim=c(0, 100), ylim=c(0, 100), type="n", axes=FALSE,
+    #     xlab="", ylab="")
+    
     # Update prevoius value
     xh <<- xi
     })
+  #output$plot2 <- renderPlot({
+  #  pushViewport(viewport())
+  #  grid.roundrect(gp=gpar(fill="grey"))
+  #  grid.clip(y=unit(1,"lines"), just="bottom")
+  #  grid.roundrect(gp=gpar(fill="white"))
+  #  popViewport()
+  #})  
   }
 
 shinyApp(ui=ui, server=server)
