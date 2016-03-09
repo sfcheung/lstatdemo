@@ -15,12 +15,14 @@ ui <- fluidPage(
   fluidRow(
     column(12,
       wellPanel(
-        h4("This page illustrates, in a simple mediation model, ",
+        p("This page illustrates, in a simple mediation model, ",
             "how the mediator (M) and dependent",
             "variable (Y) change as independent variable (X) changes. ",
             "Try to change the value of X and see how what happens. ",
             "You can also change the three effects (paths). For example, ",
-            "you can see what if X also has a positive direct effect on Y.")
+            "you can see what if X also has a positive direct effect on Y."),
+        p("If X has a direct effect, see how the regression line predicting ",
+          "Y from M will shift up or down when X changes.")
         ),
       fluidRow(
         column(4,
