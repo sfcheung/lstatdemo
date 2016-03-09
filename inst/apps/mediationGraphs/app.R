@@ -8,6 +8,8 @@
 
 xmin <- 0
 xmax <- 10
+x_init <- 5
+xh <- x_init
 
 # UI
 ui <- fluidPage(
@@ -24,32 +26,32 @@ ui <- fluidPage(
             br(),
             sliderInput('xi',
               label=h5("X"),
-              min=xmin, max=xmax, value=5, step=.5,
+              min=xmin, max=xmax, value=x_init, step=.5,
               ticks=TRUE),
             br(),
             sliderInput('bmx',
               label=h5("Effect: X on M"),
-              min=-1, max=1, value=.5, step=.1,
+              min=-2, max=2, value=1, step=.1,
               ticks=TRUE),
             br(),
             sliderInput('bym',
               label=h5("Effect: M on Y"),
-              min=-1, max=1, value=.5, step=.1,
+              min=-2, max=2, value=.5, step=.1,
               ticks=TRUE),
             br(),
             sliderInput('byx',
               label=h5("Direct Effect: X on Y"),
-              min=-1, max=1, value=0, step=.1,
+              min=-2, max=2, value=0, step=.1,
               ticks=TRUE),
             br(),
             sliderInput('bmx0',
               label=h5("Intercept: X on M"),
-              min=-1, max=1, value=0, step=.1,
+              min=-2, max=2, value=0, step=.1,
               ticks=TRUE),
             br(),
             sliderInput('bym0',
               label=h5("Intercept: M on Y"),
-              min=-1, max=1, value=0, step=.1,
+              min=-2, max=2, value=0, step=.1,
               ticks=TRUE),
             br(),
             h5("Technical details: [To be added]"),
@@ -86,30 +88,62 @@ server <- function(input, output) {
     byx <- input$byx
     bmx0 <- input$bmx0
     bym0 <- input$bym0
-    mmin0 <- bmx0 + bmx*xmin
-    mmax0 <- bmx0 + bmx*xmax
-    ymin0 <- bym0 + bym*mmin0 + byx*xmin
-    ymax0 <- bym0 + bym*mmax0 + byx*xmax
+    lm_m <- function(x) {bmx0 + bmx*x}
+    lm_y <- function(x, m) {bym0 + bym*m + byx*x}
+    mmin0 <- lm_m(xmin)
+    mmax0 <- lm_m(xmax)
+    ymin0 <- lm_y(xmin, mmin0)
+    ymax0 <- lm_y(xmax, mmax0)
     m2 <- sort(c(mmin0, mmax0))
-    #mmin <- floor(m2[1]); mmax <- ceiling(m2[2])
     mmin <- (m2[1]); mmax <- (m2[2])
     y2 <- sort(c(ymin0, ymax0))
-    #ymin <- floor(y2[1]); ymax <- ceiling(y2[2])
     ymin <- (y2[1]); ymax <- (y2[2])
+    # Previous values
+    mh <- lm_m(xh)
+    yh <- lm_y(xh, mh)
+    # Current valules
     xi <- input$xi
-    mi <- bmx0 + bmx*xi
-    yi <- bym0 + bym*mi + byx*xi
+    mi <- lm_m(xi)
+    yi <- lm_y(xi, mi)
+    # Changes
+    x_change <- xi - xh
+    m_change <- mi - mh
+    y_change <- yi - yh
+    # Plot the graphs
     par(mfrow=c(1, 2))
+    #par(oma=c(4, 2, 2, 2))
+    #par(mgp=c(0, 1, 0))
+    #par(mar=c(8, 1, 1, 1))
+    arrow_len <- .10
     plot(x=NULL, y=NULL, xlim=c(xmin, xmax), ylim=c(mmin, mmax), 
-          type="n", xlab="X", ylab="M", asp=1)
+          type="n", xlab="X", ylab="M", asp=1, 
+          main=paste("X on M (a path)", "\n",
+                     "From X: ", (xi - xh)*bmx, "=", (xi - xh), "*", bmx, sep=""),
+          sub=paste("Changes: X: ", x_change, " / ", 
+                    "M: ", m_change, sep=""))
+    parusr <- par("usr")
     abline(bmx0, bmx, lwd=2, col="blue")
-    arrows(xi, mmin, xi, mi)
-    arrows(xi, mi, xmin, mi)
+    suppressWarnings(arrows(xi, parusr[3], xi, mi, length=arrow_len, col="black", lwd=2, lty="dotted"))
+    suppressWarnings(arrows(xi, mi, parusr[1], mi, length=arrow_len, col="blue", lwd=2, lty="dotted"))
+    suppressWarnings(arrows(xh, parusr[3], xh, mh, length=arrow_len, col="black", lty="dotted"))
+    suppressWarnings(arrows(xh, mh, parusr[1], mh, length=arrow_len, col="blue", lty="dotted"))
     plot(x=NULL, y=NULL, xlim=c(mmin, mmax), ylim=c(ymin, ymax), 
-          type="n", xlab="M", ylab="Y", asp=1)
+          type="n", xlab="M", ylab="Y", asp=1, 
+          main=paste("M on Y (b path)", "\n",
+                    "Direct from X:", (xi - xh)*byx, "=", (xi - xh), "*", byx, "\n",
+                    "From M: ", (mi - mh)*bym, "=", (mi - mh), "*", bym, sep=""),
+          sub=paste("Changes: M: ", m_change, " / ",
+                    "Y: ", y_change, sep=""))
+    parusr <- par("usr")
     abline(bym0 + byx*xi, bym, lwd=2, col="red")
-    arrows(mi, ymin, mi, yi)
-    arrows(mi, yi, mmin, yi)
+    suppressWarnings(arrows(mi, parusr[3], mi, yi, length=arrow_len, col="blue", lwd=2, lty="dotted"))
+    suppressWarnings(arrows(mi, yi, parusr[1], yi, length=arrow_len, col="red", lwd=2, lty="dotted"))
+    suppressWarnings(arrows(mh, parusr[3], mh, yh, length=arrow_len, col="blue", lty="dotted"))
+    suppressWarnings(arrows(mh, yh, parusr[1], yh, length=arrow_len, col="red", lty="dotted"))
+    suppressWarnings(arrows(mh, yh, mh, lm_y(xi, mh), length=arrow_len*2, col="black", lwd=4, lty="dotted"))
+    suppressWarnings(arrows(mh, lm_y(xi, mh), mi, yi, length=arrow_len*2, col="blue", lwd=4, lty="dotted"))
+    # Update prevoius value
+    xh <<- xi
     })
   }
 
