@@ -74,7 +74,7 @@ ui <- fluidPage(
           "."
           ),
         p("The whole repository can be downloaded from GitHub and run in R by",
-          code("runGitHub(\"lstatdemo\",\"sfcheung\",subdir=\"mediationGraphs\")")
+          code("runGitHub(\"lstatdemo\",\"sfcheung\",subdir=\"inst/apps/mediationGraphs\")")
           )
         )
       )
