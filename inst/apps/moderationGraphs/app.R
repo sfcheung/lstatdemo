@@ -32,7 +32,7 @@ byxh <- byx_init + byxm_init*m_init
 
 # UI
 ui <- fluidPage(
-  titlePanel("Moderation: Illustration [Work-in-progress]"),
+  titlePanel("Moderation: Illustration"),
   fluidRow(
     column(12,
       wellPanel(
