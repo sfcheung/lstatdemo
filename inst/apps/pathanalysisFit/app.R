@@ -35,6 +35,13 @@ modelfull <- "
   behavior  ~ intention + attitude + sbjnorm + pbc
   "
 #model1fullm <- lavaan::lavaanify(modelfull, auto.var=TRUE)                               
+modelindep <- "
+  intention ~ 0*attitude  + 0*sbjnorm + 0*pbc
+  behavior  ~ 0*intention + 0*attitude + 0*sbjnorm + 0*pbc
+  attitude ~~ 0*sbjnorm
+  attitude ~~ 0*pbc
+  sbjnorm  ~~ 0*pbc
+  "
 
 new_parTable <- function(tobi_choices, tobeh_choices) {
     if (length(tobi_choices) > 0) {
@@ -51,7 +58,17 @@ new_parTable <- function(tobi_choices, tobeh_choices) {
     out <- lavaan::lavaanify(paste(tobi, "\n", tobeh, "\n", ivcov), 
                              auto.var=TRUE, fixed.x=FALSE)
   }
-      
+
+my_paths <- function(sem_fit, main) {
+  semPlot::semPaths(sem_fit, whatLabels="est",
+      sizeMan=8, sizeLat=8, nCharNodes=0, rotation=2,
+      edge.label.cex=2, edge.color="black", edge.width=1.5, 
+      node.width=1.5, curve=1.75, exoVar=TRUE,
+      style="lisrel", fixedStyle=c("white", 0),
+      mar=c(3, 10, 10, 10))
+  title(main)
+  }
+  
 # UI
 ui <- fluidPage(
   titlePanel("Path Analysis: Illustration ) (Work-in-progress)"),
@@ -60,33 +77,48 @@ ui <- fluidPage(
       wellPanel(
         p("This page illustrates..."),
         p("If ...")
-        ),
-      fluidRow(
-        column(4,
-          wellPanel(
-            h4("Model"),
-            checkboxGroupInput("tobi", "Intention is affected by:",
-                               c("attitude" = "attitude",
-                                 "sbjnorm" = "sbjnorm",
-                                 "pbc" = "pbc"),
-                               selected=c("attitude", "sbjnorm", "pbc")),
-            checkboxGroupInput("tobeh", "Behavior is affected by:",
-                               c("attitude" = "attitude",
-                                 "sbjnorm" = "sbjnorm",
-                                 "pbc" = "pbc",
-                                 "intention" = "intention"),
-                               selected="pbc"),
-            submitButton("Update the results")
-            #h5("Technical details: [To be added]"),
-            #paste("[Technical details: (To be added)]", sep="")
-            )
-          ),
-        column(8,
-          #textOutput('debugtext'),
-          plotOutput('plot')
-          )
-        )
-      )
+        ))),
+  fluidRow(
+    column(3,
+      h4("Model 1"),
+      checkboxGroupInput("tobi", "Intention is affected by:",
+                         c("attitude" = "attitude",
+                           "sbjnorm" = "sbjnorm",
+                           "pbc" = "pbc"),
+                         selected=c("attitude", "sbjnorm", "pbc"))),
+    column(3, 
+      h4("Model 1"),
+      checkboxGroupInput("tobeh", "Behavior is affected by:",
+                         c("attitude" = "attitude",
+                           "sbjnorm" = "sbjnorm",
+                           "pbc" = "pbc",
+                           "intention" = "intention"),
+                           selected=c("intention"))),
+    column(3, 
+      h4("Model 2"),
+      checkboxGroupInput("tobi2", "Intention is affected by:",
+                         c("attitude" = "attitude",
+                           "sbjnorm" = "sbjnorm",
+                           "pbc" = "pbc"),
+                         selected=c("attitude", "sbjnorm", "pbc"))),
+    column(3, 
+      h4("Model 2"),
+      checkboxGroupInput("tobeh2", "Behavior is affected by:",
+                         c("attitude" = "attitude",
+                           "sbjnorm" = "sbjnorm",
+                           "pbc" = "pbc",
+                           "intention" = "intention"),
+                         selected=c("pbc", "intention")))
+      ),
+  fluidRow(
+    column(12, submitButton("Update the results"))
+    ),
+  fluidRow(column(12, plotOutput('plot'))),
+  fluidRow(
+    column(3, dataTableOutput('resindep')),
+    column(3, dataTableOutput('res1')),
+    column(3, dataTableOutput('res2')),
+    column(3, dataTableOutput('resfull'))
     ),
   fluidRow(
     column(12,
@@ -110,21 +142,25 @@ server <- function(input, output) {
   model2_fit <<- model1_fit
   model3 <<- model2
   model3_fit <<- model2_fit
-  getModel <- reactive(new_parTable(input$tobi, input$tobeh))
+  getModel  <- reactive(new_parTable(input$tobi, input$tobeh))
+  getModel2 <- reactive(new_parTable(input$tobi2, input$tobeh2))
   output$plot <- renderPlot({
     model1 <<- getModel()
-    model1_fit <<- lavaan::sem(model1, mydata)
-    semPlot::semPaths(model1_fit, whatLabels="est",
-        sizeMan=4,
-        sizeLat=8,
-        nCharNodes=0,
-        curve=1.5,
-        rotation=2,
-        edge.label.cex=1,
-        edge.color="black",
-        edge.width=1, node.width=1.25,
-        style="lisrel", fixedStyle=c("white", 0))
+    model1_fit <<- lavaan::sem(model1, mydata, fixed.x=FALSE)
+    model2 <<- getModel2()
+    model2_fit <<- lavaan::sem(model2, mydata, fixed.x=FALSE)
+    modelindep_fit <<- lavaan::sem(modelindep, mydata, fixed.x=FALSE)
+    modelfull_fit <<- lavaan::sem(modelfull, mydata, fixed.x=FALSE)
+    par(mfrow=c(1, 4))
+    my_paths(modelindep_fit, "Independence Model")
+    my_paths(model1_fit, "Model 1")
+    my_paths(model2_fit, "Model 2")
+    my_paths(modelfull_fit, "Saturated Model")
     })
+  output$resindep <- renderDataTable(round(lavaan::residuals(modelindep_fit)$cov, 3))
+  output$res1     <- renderDataTable(round(lavaan::residuals(model1_fit)$cov, 3))
+  output$res2     <- renderDataTable(round(lavaan::residuals(model2_fit)$cov, 3))
+  output$resfull  <- renderDataTable(round(lavaan::residuals(modelfull_fit)$cov, 3))
   }
 
 shinyApp(ui=ui, server=server)
