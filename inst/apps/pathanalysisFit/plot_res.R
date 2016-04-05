@@ -1,3 +1,5 @@
+# Not yet working.
+
 plot_res <- function(x) {
   if (is.null(colnames(x))) {
     colnames(x) <- rownames(x) <- paste("x", 1:nrow(x))
