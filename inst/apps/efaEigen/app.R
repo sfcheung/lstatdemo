@@ -115,14 +115,14 @@ update_datas <- function(modelselected, cfaplist, modelnamelist, n, lambdas=.5) 
 
 my_paths <- function(sem_fit, main) {
   if (length(grep("NullModel", sem_fit)) > 0) {
-    semPlot::semPaths(sem_fit, whatLabels="par",
+    semPlot::semPaths(lavaan::lavaanify(sem_fit), whatLabels="par",
         sizeMan=6, sizeLat=8, nCharNodes=0, rotation=2,
         edge.label.cex=2.5, edge.color="black", edge.width=1, 
         node.width=1.5, curve=1.75, exoVar=FALSE, residuals=FALSE,
         style="lisrel", fixedStyle=c("white", 0),
         mar=c(3, 10, 5, 10))
     } else {
-    semPlot::semPaths(sem_fit, whatLabels="par", 
+    semPlot::semPaths(lavaan::lavaanify(sem_fit), whatLabels="par", 
         sizeMan=6, sizeLat=8, nCharNodes=0, rotation=2,
         edge.label.cex=2.5, edge.color="black", edge.width=1, 
         node.width=1.5, curve=1.75, exoVar=FALSE, residuals=FALSE,
