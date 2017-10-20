@@ -11,9 +11,9 @@ if (!(requireNamespace("lavaan", quietly = TRUE) &
 modelp <- "
   intention ~ .4*attitude + .3*sbjnorm + .3*pbc
   behavior  ~ .4*intention + .2*attitude + .2*sbjnorm + .4*pbc
-  attitude ~~ .2*sbjnorm
-  attitude ~~ .2*pbc
-  sbjnorm  ~~ .21*pbc
+  attitude ~~ .0*sbjnorm
+  attitude ~~ .0*pbc
+  sbjnorm  ~~ .0*pbc
   "
 n <- 200
 mydata <- lavaan::simulateData(model=modelp, sample.nobs = n, seed = 897981,
