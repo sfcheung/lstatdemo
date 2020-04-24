@@ -134,7 +134,7 @@ my_paths <- function(sem_fit, main) {
 
 my_scree <- function(data, main, ...) {
   my_fit <- princomp(data, cor=TRUE)
-  plot(my_fit, type="lines", main=main, ...)
+  plot(my_fit, type="lines", main=main, npc = 12, ...)
   }
   
 # UI
