@@ -210,7 +210,7 @@ ui <- fluidPage(
           "."
           ),
         p("The whole repository can be downloaded from GitHub and run in R by",
-          code("runGitHub(\"lstatdemo\",\"sfcheung\",subdir=\"inst/apps/efaEigen\")")
+          code("shiny::runGitHub(\"lstatdemo\",\"sfcheung\",subdir=\"inst/apps/efaEigen\")")
           )
         )
       )
