@@ -5,3 +5,5 @@ NOTE: This package will not be updated. Will move back to [statdemos](https://gi
 Demonstrations, usually shiny apps, for learning statistics.
 
 Still in very early development. Apps in `statDemos` have been migrated to this repository. However, they have not yet been fully adapted.
+
+(Tests. Please ignore)
